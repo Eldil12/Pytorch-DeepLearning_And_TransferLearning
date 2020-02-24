@@ -1,2 +1,4 @@
-data/train/*
-data/test/*
+data/train/
+data/test/
+**/__pycache__
+checkpoints/
