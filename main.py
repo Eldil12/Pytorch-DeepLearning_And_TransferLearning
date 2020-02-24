@@ -38,10 +38,13 @@ def train(**kwargs):
     # step3: 目标函数和优化器
     criterion = t.nn.CrossEntropyLoss()  # 交叉熵损失函数
     lr = opt.lr
-    # optimizer = t.optim.Adam(model.parameters(), lr=opt.lr, weight_decay=opt.weight_decay)  # Adam算法
+    optimizer = t.optim.Adam(model.parameters(), lr=opt.lr, weight_decay=opt.weight_decay)  # Adam算法
+    """
+    # 冻结除全连接层外的所有层，只训练最后的全连接层（用于finetune）
     for para in list(model.parameters())[:-1]:
         para.requires_grad = False
     optimizer = t.optim.Adam(params=[model.fc.weight, model.fc.bias], lr=opt.lr, weight_decay=opt.weight_decay)  # Adam算法
+    """
 
     # step4: 统计指标：平滑处理之后的损失，还有混淆矩阵
     loss_meter = meter.AverageValueMeter()  # 能够计算所有数的平均值和标准差，用来统计一次训练中损失的平均值
@@ -115,7 +118,7 @@ def val(model, dataloader):
     # 计算准确率
     cm_value = confusion_matrix.value()
     correct_num = 0
-    for i in range(cm_value.ndim):
+    for i in range(opt.num_labels):
         correct_num += cm_value[i][i]
     accuracy = 100. * correct_num / (cm_value.sum())
     return confusion_matrix, accuracy
@@ -152,11 +155,8 @@ def test(**kwargs):
         # 计算top-1和top-k准确率
         _, maxk = t.topk(score, opt.k, dim=-1)
         label = label.view(-1, 1).to(opt.device)  # 将label从[n]变为[n,1]便于和[n,k]的maxk比较，其中n为batch大小
-        top1 += t.eq(label, maxk[:, 0].to(opt.device)).sum().float().item()
+        top1 += t.eq(label, maxk[:, 0:1].to(opt.device)).sum().float().item()
         topk += t.eq(label, maxk.to(opt.device)).sum().float().item()
-        print('Accuracy of the network on total {} test images: @top1={}%; @top{}={}%'.format(total, 100 * top1 / total,
-                                                                                              opt.k,
-                                                                                              100 * topk / total))
 
         # 根据probability中每一行的最大值及其索引获取分类信息
         label_info = probability.max(dim=1)
@@ -168,6 +168,9 @@ def test(**kwargs):
                          for id_, pred_, probability_ in zip(img_id, label_pred, label_probability)]
         results += batch_results
 
+    print('Accuracy of the network on total {} test images: top1={}%; top{}={}%'.format(total, 100 * top1 / total,
+                                                                                        opt.k,
+                                                                                        100 * topk / total))
     write_csv(results, opt.result_file)
 
     return results
@@ -187,6 +190,7 @@ def write_csv(results, file_name):
 
 
 if __name__ == '__main__':
-    import fire
+    # import fire
 
-    fire.Fire()
+    # fire.Fire()
+    test()

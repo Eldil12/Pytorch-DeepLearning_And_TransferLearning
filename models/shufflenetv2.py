@@ -1,6 +1,7 @@
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
+from .BasicModule import BasicModule
 from config import opt
 
 
@@ -90,7 +91,7 @@ class ShuffleUnit(nn.Module):
         return x
 
 
-class ShuffleNetV2(nn.Module):
+class ShuffleNetV2(BasicModule):
 
     def __init__(self, ratio=1, class_num=opt.num_labels):
         super().__init__()
