@@ -2,7 +2,6 @@
 import os
 from PIL import Image
 from torch.utils import data
-import numpy as np
 from torchvision import transforms as t
 
 
@@ -44,12 +43,12 @@ class SceneData(data.Dataset):
         # 若进行测试，使用所有数据
         if self.test:
             self.imgs = imgs
-        # 若进行训练，使用前70%的数据
+        # 若进行训练，使用前80%的数据
         elif train:
-            self.imgs = imgs[:int(0.7 * imgs_num)]
-        # 若进行验证，使用后30%的数据
+            self.imgs = imgs[:int(0.8 * imgs_num)]
+        # 若进行验证，使用后20%的数据
         else:
-            self.imgs = imgs[int(0.7 * imgs_num):]
+            self.imgs = imgs[int(0.8 * imgs_num):]
 
         # 预处理
         if transforms is None:
@@ -61,7 +60,6 @@ class SceneData(data.Dataset):
             if self.test or not train:
                 self.transforms = t.Compose([
                     t.Resize(224),
-                    t.CenterCrop(224),
                     t.ToTensor(),
                     normalize
                 ])

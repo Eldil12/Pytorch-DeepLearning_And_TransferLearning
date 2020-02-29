@@ -16,19 +16,20 @@ class DefaultConfig(object):
 
     train_data_root = '.\\data\\train\\'  # 训练集存放路径
     test_data_root = '.\\data\\test\\'  # 测试集存放路径
-    load_model_path = './checkpoints/ResNet_0224_21-24-45.pth'  # './checkpoints/ResNet_0224_21-24-45.pth'  # 加载预训练的模型的路径，为None代表不加载
+    load_model_path = './checkpoints/ResNet_0228_15-51-30.pth'#'./checkpoints/ResNet_0224_21-24-45.pth'  # 加载预训练的模型的路径，为None代表不加载
 
     batch_size = 16  # 每一批的数据量
     use_gpu = True  # 是否使用GPU
     num_workers = 4  # 使用多进程加载的进程数，0代表不使用多进程
     print_freq = 20  # 每训练print_freq个batch则绘制一次曲线
 
-    max_epoch = 100  # 最大训练轮数
+    max_epoch = 30  # 最大训练轮数
     lr = 0.001  # 初始学习率
     lr_decay = 0.5  # 学习率衰减
     weight_decay = 1e-5  # 损失函数
 
     k = 5  # top-k准确率
+    ensemble = True  # 采样决策融合分类
 
     result_file = 'result.csv'
 
